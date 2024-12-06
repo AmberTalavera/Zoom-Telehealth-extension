@@ -1,0 +1,23 @@
+from flask import Blueprint, render_template, request, jsonify
+from .zoom_api import schedule_meeting, generate_zoom_signature
+from .ai_utils import analyze_consultation
+
+bp = Blueprint("main", __name__)
+
+@bp.route("/")
+def index():
+    return render_template("index.html")
+
+@bp.route("/schedule", methods=["POST"])
+def schedule():
+    data = request.json
+    patient_name = data.get("patient_name")
+    meeting_time = data.get("meeting_time")  # ISO format
+    response = schedule_meeting(patient_name, meeting_time)
+    return jsonify(response)
+
+@bp.route("/analyze", methods=["POST"])
+def analyze():
+    consultation_notes = request.json.get("notes")
+    analysis = analyze_consultation(consultation_notes)
+    return jsonify(analysis)
